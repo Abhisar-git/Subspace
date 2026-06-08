@@ -1,48 +1,50 @@
-# Subspace Cold-Outreach Pipeline
+# Subspace: Automated B2B Lead Generation & Outreach Pipeline
 
-An automated, high-deliverability lead sourcing, email verification, and outbound cold outreach pipeline built with **TypeScript**, leveraging **Apollo.io**, **Prospeo.io**, and **Resend**.
-
----
-
-## 🚀 Overview
-
-This application automates the process of finding lookalike companies, extracting decision-makers, resolving/verifying their email addresses, and sending personalized outreach emails.
-
-```
-[Seed Domain] ➔ [Apollo: Lookalike Search] ➔ [Prospeo: Find & Verify Decision Makers]
-                                                              │
-                                                              ▼
-                                                [Resend: Outbound Cold Email]
-```
-
-### Key Stages
-1. **Stage 1: Sourcing Lookalike Companies**: Resolves the seed domain using Apollo.io, extracts its industry tags, and searches for similar companies.
-2. **Stages 2 & 3: Sourcing & Verifying Decision-Makers**: Queries Prospeo's Domain Search API for C-suite / VP-level decision makers at lookalike companies, automatically retrieving their names, titles, LinkedIn URLs, and verified emails in one high-efficiency step.
-3. **Stage 4: Cold Outreach (with Safety Checkpoint)**: Displays a preview table of all resolved contacts, prompts for user confirmation via CLI, and initiates outreach via Resend using a responsive HTML template.
+Subspace is a high-deliverability lead generation, email verification, and personalized outbound cold outreach pipeline built in **TypeScript**. It connects B2B seed data to multi-stage outreach campaigns by chaining **Apollo.io**, **Prospeo.io**, and **Resend**.
 
 ---
 
-## 📋 Compliance Checklist
+## 🚀 How it Works
 
-This application is fully compliant with the Subspace & Vocallabs assignment instructions:
+```
+  [ Seed Company ]
+         │
+         ▼
+ 1. SOURCING LOOKALIKES  ─── ( Apollo.io Company Search & Enrichment )
+         │
+         ▼
+ 2. CONTACT RESOLUTION   ─── ( Prospeo.io Search & Contact Sourcing )
+         │
+         ▼
+ 3. EMAIL VERIFICATION   ─── ( Prospeo.io Verification & Enrichment )
+         │
+         ▼
+ 4. SAFETY CHECKPOINT    ─── ( Terminal Preview & Confirmation Table )
+         │
+         ▼
+ 5. COLD OUTREACH        ─── ( Resend Custom HTML Outreach Emails )
+```
 
-| Requirement | Implementation / Status | Action Required by You |
-|:---|:---|:---|
-| **Domain Setup** | Supported via Resend service configuration. | Verify your purchased Namecheap/Student domain in Resend and update `SENDER_EMAIL` in `.env` |
-| **Ocean.io Alternative** | Uses **Apollo.io** (which offers free API credits). | Set up a free account on Apollo.io and copy your API key to `.env` |
-| **Eazyreach Alternative** | Uses **Prospeo.io** to retrieve contacts, LinkedIn URLs, and emails. | Set up a free account on Prospeo.io and copy your API key to `.env` |
-| **Demo Video** | - | Record a video demonstrating the run using [Explaino](https://explaino.app/) |
-| **Submission Portal** | - | Submit the final ZIP file and video link to the [Submission Portal](https://jobapply.site/d09ca246-605e-47ca-a59c-f802dfc6f5cd) |
+---
+
+## ✨ Features
+
+- **Stage 1: Lookalike Sourcing (Apollo.io)**: Automatically resolves the seed company domain, extracts its categorization/industry tags, and identifies similar lookalike organizations.
+- **Stage 2 & 3: Sourcing & Email Verification (Prospeo.io)**: Leverages a high-efficiency search-and-enrich pipeline to identify key decision-makers (CEOs, Founders, VPs, Directors) at target lookalikes, pulling their name, job title, LinkedIn profile, and verified unmasked business email.
+- **Stage 4: CLI Safety Checkpoint**: Displays a beautifully formatted preview table of all sourced leads before launching any cold outreach, requiring explicit user input (`y/N`) to proceed.
+- **Stage 5: High-Deliverability Outreach (Resend)**: Personalizes outbound messages using a responsive, modern HTML email template sent via your verified custom domain.
+- **Dual Runtime Support**: Runs in **Mock Mode** (using simulator APIs for local testing without credit consumption) or **Production Mode** (uses real API integrations).
 
 ---
 
 ## 🛠️ Setup & Installation
 
 ### 1. Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed (v18+ recommended).
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- A verified domain configured on [Resend.com](https://resend.com) (for live sending)
 
 ### 2. Install Dependencies
-Run the following command in the project root:
+Run the following in the project root:
 ```bash
 npm install
 ```
@@ -62,85 +64,48 @@ RESEND_API_KEY=your_resend_api_key
 # Sender Email Address (Verified domain sender e.g., hello@yourdomain.com)
 SENDER_EMAIL=hello@yourdomain.com
 
-# Recipient Email Override (Optional - for testing)
-# Redirects all outbound emails to your own inbox to prevent emailing real leads during testing
+# Recipient Email Override (Optional - redirects all emails to this address during testing)
 RECIPIENT_OVERRIDE=your-test-email@gmail.com
 ```
 
-> [!IMPORTANT]
-> To run the app in **mock/simulation mode** for testing without consuming API credits, leave the API keys prefixed with `mock_` (e.g. `APOLLO_API_KEY=mock_apollo_key`).
+> [!TIP]
+> To run the app in **mock/simulation mode** for developer dry runs, set the API keys prefixed with `mock_` (e.g. `APOLLO_API_KEY=mock_apollo`).
 
 ---
 
-## ⚡ Running the Application
+## ⚡ Running the Pipeline
 
-To run the pipeline, provide a seed company domain (e.g., `stripe.com`) as an argument:
+To run the pipeline, provide a seed company domain (e.g., `stripe.com` or `intercom.com`) as an argument:
 
 ```bash
+# Run using ts-node
 npm run dev -- stripe.com
-```
 
-### Example Run (Mock Mode)
-
-```
-┌────────────────────────────────────────────────────────┐
-│                                                        │
-│   SUBSPACE COLD-OUTREACH PIPELINE                      │
-│   Automated Lead Sourcing, Verification & Send System   │
-│                                                        │
-└────────────────────────────────────────────────────────┘
-
-Warning: Using mock/placeholder values for the following keys:
- - APOLLO_API_KEY
- - PROSPEO_API_KEY
- - RESEND_API_KEY
-
-The pipeline will run in MOCK mode. Real API requests will be simulated.
-
-=== Stage 1: Sourcing Lookalike Companies ===
-Enriching seed domain: stripe.com...
-[Apollo API] [MOCK] Enriching company domain: stripe.com
-Seed Company resolved: STRIPE
-
-Searching for up to 5 similar companies...
-Found lookalike company domains: adyen.com, checkout.com, plaid.com, brex.com, revolut.com
-
-=== Stages 2 & 3: Finding & Verifying Decision-Makers ===
-Searching Prospeo Domain Search API for decision makers (limit: 1 per company)...
-
-Querying domain: adyen.com...
-[Prospeo API] [MOCK] Performing Domain Search for: adyen.com
-✔ Decision maker resolved: Pieter van der Does (Co-Founder & CEO) -> pieter@adyen.com
-
-Querying domain: checkout.com...
-[Prospeo API] [MOCK] Performing Domain Search for: checkout.com
-✔ Decision maker resolved: Guillaume Pousaz (Founder & CEO) -> guillaume@checkout.com
-...
-
-==================== SAFETY CHECKPOINT ====================
-Review the resolved leads below before initiating outbound emails:
-
-┌─────────┬───┬───────────────────────┬───────────────────────┬────────────┬────────────────────────────────────────────────┬──────────────────────────┐
-│ (index) │ # │ Name                  │ Title                 │ Company    │ LinkedIn URL                                   │ Verified Email           │
-├─────────┼───┼───────────────────────┼───────────────────────┼────────────┼────────────────────────────────────────────────┼──────────────────────────┤
-│ 0       │ 1 │ 'Pieter van der Does' │ 'Co-Founder & CEO'    │ 'ADYEN'    │ 'https://www.linkedin.com/in/pietervanderdoes' │ 'pieter@adyen.com'       │
-│ 1       │ 2 │ 'Guillaume Pousaz'    │ 'Founder & CEO'       │ 'CHECKOUT' │ 'https://www.linkedin.com/in/gpousaz'          │ 'guillaume@checkout.com' │
-└─────────┴───┴───────────────────────┴───────────────────────┴────────────┴────────────────────────────────────────────────┴──────────────────────────┘
-
-Are you sure you want to fire outreach emails to these 5 contact(s)? (y/N): y
-
-✔ Confirmation received. Launching stage 4 outreach...
-✔ Successfully sent! Tracking ID: re_mock_mdfx93lda
-✔ Successfully sent! Tracking ID: re_mock_mio0uo1lg
-...
+# Or build and run the compiled version
+npm run build
+npm start -- stripe.com
 ```
 
 ---
 
-## 📦 Packaging for Submission
+## 📂 Project Structure
 
-To create a clean ZIP package for submission (excluding `node_modules` and `dist` build folders), run the following command in PowerShell:
-
-```powershell
-Compress-Archive -Path .\src, .\package.json, .\package-lock.json, .\tsconfig.json, .\.env.example, .\README.md -DestinationPath .\subspace-outreach-pipeline.zip -Force
 ```
+├── dist/                # Compiled JavaScript code
+├── src/
+│   ├── config.ts        # App configuration & validation rules
+│   ├── index.ts         # Main CLI Entry runner & safety prompt UI
+│   ├── pipeline.ts      # Core lead sourcing & outreach orchestrator
+│   └── services/
+│       ├── apollo.ts    # Apollo.io wrapper (lookalikes lookup & fallbacks)
+│       ├── prospeo.ts   # Prospeo.io search-person & enrich-person wrapper
+│       └── resend.ts    # Resend.com HTML template email dispatch service
+├── .env.example         # Template for environment variables
+├── package.json
+└── tsconfig.json
+```
+
+---
+
+## 📄 License
+This project is licensed under the ISC License.
