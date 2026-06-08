@@ -84,6 +84,9 @@ export class OutreachPipeline {
       } catch (error: any) {
         console.error(`\x1b[33m⚠ Error processing domain ${domain}: ${error.message}\x1b[0m`);
       }
+      
+      // Sleep for 1.5 seconds to respect Prospeo API rate limits (HTTP 429)
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     console.log(`\n\x1b[32mResolution complete! Sourced ${enrichedContacts.length} verified decision-maker(s) from Prospeo.\x1b[0m`);
