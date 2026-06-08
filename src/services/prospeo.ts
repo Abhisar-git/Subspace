@@ -27,13 +27,30 @@ export class ProspeoService {
     this.apiKey = apiKey;
   }
 
+  private async fetchWithRetry(url: string, options: any, maxRetries = 3): Promise<Response> {
+    let delay = 2000;
+    for (let i = 0; i < maxRetries; i++) {
+      const response = await fetch(url, options);
+      if (response.status === 429) {
+        const resetHeader = response.headers.get("x-minute-reset-seconds") || response.headers.get("retry-after");
+        const waitTime = resetHeader ? parseInt(resetHeader, 10) * 1000 + 500 : delay;
+        console.warn(`[Prospeo API] Rate limited (429). Retrying in ${waitTime / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        delay *= 2;
+        continue;
+      }
+      return response;
+    }
+    return fetch(url, options);
+  }
+
   /**
    * Search for decision makers at a specific company domain.
    * Leverages Prospeo's Domain Search API.
    */
   async findDecisionMakers(domain: string, limit: number = 1): Promise<ContactInfo[]> {
     try {
-      const response = await fetch("https://api.prospeo.io/search-person", {
+      const response = await this.fetchWithRetry("https://api.prospeo.io/search-person", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +100,7 @@ export class ProspeoService {
         }
 
         try {
-          const enrichResponse = await fetch("https://api.prospeo.io/enrich-person", {
+          const enrichResponse = await this.fetchWithRetry("https://api.prospeo.io/enrich-person", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
