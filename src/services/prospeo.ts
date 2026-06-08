@@ -22,11 +22,9 @@ export interface ContactInfo {
 
 export class ProspeoService {
   private apiKey: string;
-  private isMock: boolean;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
-    this.isMock = apiKey.startsWith("mock_");
   }
 
   /**
@@ -34,100 +32,6 @@ export class ProspeoService {
    * Leverages Prospeo's Domain Search API.
    */
   async findDecisionMakers(domain: string, limit: number = 1): Promise<ContactInfo[]> {
-    if (this.isMock) {
-      console.log(`[Prospeo API] [MOCK] Performing Domain Search for: ${domain}`);
-      
-      // Seed some realistic mock contacts based on domains
-      const mockContactsByDomain: Record<string, ProspeoEmailContact[]> = {
-        "adyen.com": [
-          {
-            email: "pieter@adyen.com",
-            first_name: "Pieter",
-            last_name: "van der Does",
-            type: "professional",
-            verification_status: "verified",
-            confidence_score: 99,
-            job_title: "Co-Founder & CEO",
-            linkedin: "https://www.linkedin.com/in/pietervanderdoes"
-          }
-        ],
-        "checkout.com": [
-          {
-            email: "guillaume@checkout.com",
-            first_name: "Guillaume",
-            last_name: "Pousaz",
-            type: "professional",
-            verification_status: "verified",
-            confidence_score: 98,
-            job_title: "Founder & CEO",
-            linkedin: "https://www.linkedin.com/in/gpousaz"
-          }
-        ],
-        "plaid.com": [
-          {
-            email: "zach@plaid.com",
-            first_name: "Zach",
-            last_name: "Perret",
-            type: "professional",
-            verification_status: "verified",
-            confidence_score: 97,
-            job_title: "Co-Founder & CEO",
-            linkedin: "https://www.linkedin.com/in/zperret"
-          }
-        ],
-        "brex.com": [
-          {
-            email: "henrique@brex.com",
-            first_name: "Henrique",
-            last_name: "Dubugras",
-            type: "professional",
-            verification_status: "verified",
-            confidence_score: 98,
-            job_title: "Co-Founder & Co-CEO",
-            linkedin: "https://www.linkedin.com/in/hdubugras"
-          }
-        ],
-        "revolut.com": [
-          {
-            email: "nikolay@revolut.com",
-            first_name: "Nikolay",
-            last_name: "Storonsky",
-            type: "professional",
-            verification_status: "verified",
-            confidence_score: 96,
-            job_title: "Founder & CEO",
-            linkedin: "https://www.linkedin.com/in/nstoronsky"
-          }
-        ]
-      };
-
-      const rawContacts = mockContactsByDomain[domain.toLowerCase()] || [
-        {
-          email: `contact@${domain}`,
-          first_name: "Alex",
-          last_name: "Smith",
-          type: "professional",
-          verification_status: "verified",
-          confidence_score: 95,
-          job_title: "Founder & Managing Director",
-          linkedin: `https://www.linkedin.com/in/alex-smith-${domain.split(".")[0]}`
-        }
-      ];
-
-      return rawContacts
-        .slice(0, limit)
-        .map(c => ({
-          name: c.first_name && c.last_name ? `${c.first_name} ${c.last_name}` : c.first_name || c.last_name || c.email.split("@")[0],
-          firstName: c.first_name || "",
-          lastName: c.last_name || "",
-          title: c.job_title || "Decision Maker",
-          companyName: domain.split(".")[0].toUpperCase(),
-          companyDomain: domain,
-          linkedinUrl: c.linkedin || undefined,
-          email: c.email
-        }));
-    }
-
     try {
       const response = await fetch("https://api.prospeo.io/search-person", {
         method: "POST",

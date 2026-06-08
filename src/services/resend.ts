@@ -7,12 +7,9 @@ export interface OutreachResult {
 export class ResendService {
   private apiKey: string;
   private senderEmail: string;
-  private isMock: boolean;
-
   constructor(apiKey: string, senderEmail: string = "onboarding@resend.dev") {
     this.apiKey = apiKey;
     this.senderEmail = senderEmail;
-    this.isMock = apiKey.startsWith("mock_");
   }
 
   // Generate a premium HTML email template for outreach
@@ -53,19 +50,6 @@ export class ResendService {
   ): Promise<OutreachResult> {
     const subject = `Outreach: Connecting with ${companyName}`;
     const htmlBody = this.getEmailTemplate(contactName, title, companyName);
-
-    if (this.isMock) {
-      const mockId = `re_mock_${Math.random().toString(36).substring(2, 11)}`;
-      console.log(`\x1b[32m[Resend API] [MOCK] Sending email:\x1b[0m`);
-      console.log(` - From: ${this.senderEmail}`);
-      console.log(` - To: ${toEmail}`);
-      console.log(` - Subject: ${subject}`);
-      console.log(` - Message ID: ${mockId}\n`);
-      return {
-        success: true,
-        id: mockId
-      };
-    }
 
     try {
       const response = await fetch("https://api.resend.com/emails", {

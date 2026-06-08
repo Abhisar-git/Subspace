@@ -29,19 +29,13 @@ export const config: Config = {
 // Validates the configuration and prints helpful troubleshooting tips if keys are default/missing
 export function validateConfig(quiet: boolean = false): boolean {
   const missingKeys: string[] = [];
-  const placeholderKeys: string[] = [];
 
   if (!config.apolloApiKey) missingKeys.push("APOLLO_API_KEY");
-  else if (config.apolloApiKey.startsWith("mock_")) placeholderKeys.push("APOLLO_API_KEY");
-
   if (!config.prospeoApiKey) missingKeys.push("PROSPEO_API_KEY");
-  else if (config.prospeoApiKey.startsWith("mock_")) placeholderKeys.push("PROSPEO_API_KEY");
-
   if (!config.resendApiKey) missingKeys.push("RESEND_API_KEY");
-  else if (config.resendApiKey.startsWith("mock_")) placeholderKeys.push("RESEND_API_KEY");
 
   if (quiet) {
-    return missingKeys.length === 0 && placeholderKeys.length === 0;
+    return missingKeys.length === 0;
   }
 
   if (missingKeys.length > 0) {
@@ -49,13 +43,6 @@ export function validateConfig(quiet: boolean = false): boolean {
     missingKeys.forEach(key => console.error(` - ${key}`));
     console.error("\nPlease update your .env file with your valid API keys.\n");
     return false;
-  }
-
-  if (placeholderKeys.length > 0) {
-    console.warn("\x1b[33mWarning: Using mock/placeholder values for the following keys:\x1b[0m");
-    placeholderKeys.forEach(key => console.warn(` - ${key}`));
-    console.warn("\nThe pipeline will run in MOCK mode. Real API requests will be simulated.\n");
-    return true; // We allow running in mock mode for testing/demo purposes.
   }
 
   return true;
